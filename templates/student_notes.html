@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📚 Your Notes</h2>
+
+{% if notes %}
+  <table border="1" cellpadding="6">
+    <tr><th>Subject</th><th>Title</th><th>Download</th></tr>
+    {% for note in notes %}
+      <tr>
+        <td>{{ note[0] }}</td>
+        <td>{{ note[1] }}</td>
+        <td><a href="/static/notes/{{ note[2] }}" download>📥 Download</a></td>
+      </tr>
+    {% endfor %}
+  </table>
+{% else %}
+  <p>No notes available for your assigned subjects.</p>
+{% endif %}
+
+<a href="/student_dashboard/{{ student_id }}">⬅️ Back</a>
+{% endblock %}

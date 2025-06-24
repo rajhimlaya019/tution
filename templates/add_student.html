@@ -1,12 +1,27 @@
-<!-- templates/add_student.html -->
 {% extends "base.html" %}
 {% block content %}
-  <h2>➕ Add Student</h2>
-  <form method="POST" action="/add_student">
-    Name: <input type="text" name="name" required><br><br>
-    Phone: <input type="text" name="phone" required><br><br>
-    Class: <input type="text" name="student_class"><br><br>
-    Address: <input type="text" name="address"><br><br>
-    <button type="submit">Save Student</button>
-  </form>
+<h2>➕ Add Student</h2>
+<form method="POST" action="/add_student">
+  <label>Name:</label><br>
+  <input type="text" name="name" required><br><br>
+
+  <label>Phone:</label><br>
+  <input type="text" name="phone" required><br><br>
+
+  <label>Class:</label><br>
+  <input type="text" name="student_class"><br><br>
+
+  <label>Address:</label><br>
+  <input type="text" name="address"><br><br>
+
+  <label>Subjects:</label><br>
+  <input type="checkbox" name="subjects" value="Maths"> Maths<br>
+  <input type="checkbox" name="subjects" value="Physics"> Physics<br>
+  <input type="checkbox" name="subjects" value="Biology"> Biology<br>
+  <input type="checkbox" name="subjects" value="Chemistry"> Chemistry<br><br>
+
+  <button type="submit">✅ Save Student</button>
+</form>
+
+<a href="/admin_dashboard">🔙 Back to Dashboard</a>
 {% endblock %}

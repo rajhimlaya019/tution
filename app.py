@@ -258,8 +258,10 @@ def student_login():
                 return redirect(f"/student_dashboard/{student[0]}")
         else:
             error = "❌ Invalid ID or Password"
-    
+
     return render_template("student_login.html", error=error)
+
+
 
 
 @app.route("/student_dashboard/<int:student_id>")
@@ -281,30 +283,25 @@ def student_attendance(student_id):
     return render_template("student_attendance.html", data=rows, student_id=student_id)
 
 @app.route("/notes/<int:student_id>")
-def view_notes_filtered(student_id):   # ← function name change kiya
+def view_notes(student_id):
     conn = sqlite3.connect("db.sqlite3")
     cur = conn.cursor()
 
-    # get student class
-    cur.execute("SELECT student_class FROM students WHERE id=?", (student_id,))
-    row = cur.fetchone()
-    if not row:
-        return "Student not found"
-    student_class = row[0]
+    # Get assigned subjects for the student
+    cur.execute("SELECT subject FROM subject_mapping WHERE student_id=?", (student_id,))
+    allowed_subjects = [row[0] for row in cur.fetchall()]
 
-    # fetch only active subjects' notes
-    cur.execute("""
-        SELECT * FROM notes
-        WHERE class=? AND subject IN (
-            SELECT subject FROM subject_enrollment
-            WHERE student_id=? AND status='active'
-        )
-    """, (student_class, student_id))
+    if not allowed_subjects:
+        return "❌ No subjects assigned by Admin."
 
+    # Fetch notes only for allowed subjects
+    cur.execute("SELECT subject, note_title, note_file FROM notes WHERE subject IN ({seq})"
+                .format(seq=','.join(['?']*len(allowed_subjects))), allowed_subjects)
     notes = cur.fetchall()
-    conn.close()
 
-    return render_template("notes.html", notes=notes)
+    conn.close()
+    return render_template("student_notes.html", notes=notes, student_id=student_id)
+
 
 @app.route("/test_marks/<int:student_id>")
 def test_marks(student_id):
@@ -413,30 +410,28 @@ def mark_attendance():
 
 @app.route("/bulk_whatsapp")
 def bulk_whatsapp():
+    if "role" not in session or session["role"] != "admin":
+        return "⛔ Access Denied"
+
     conn = sqlite3.connect("db.sqlite3")
     cur = conn.cursor()
 
-    # All students with fees
-    cur.execute("SELECT id, name, mobile FROM students")
+    # Student: id, name, mobile, total_fee, paid
+    cur.execute("""
+        SELECT s.id, s.name, s.mobile,
+               IFNULL(f.total_fee, 0),
+               IFNULL(SUM(fh.amount_paid), 0)
+        FROM students s
+        LEFT JOIN fees f ON s.id = f.student_id
+        LEFT JOIN fees_history fh ON s.id = fh.student_id
+        GROUP BY s.id
+        HAVING (f.total_fee - IFNULL(SUM(fh.amount_paid), 0)) > 0
+    """)
+
     students = cur.fetchall()
-
-    due_list = []
-    for stu in students:
-        sid, name, mobile = stu
-        cur.execute("SELECT total_fee FROM fees WHERE student_id=?", (sid,))
-        f = cur.fetchone()
-        total = f[0] if f else 0
-
-        cur.execute("SELECT amount_paid FROM fees_history WHERE student_id=?", (sid,))
-        paid_rows = cur.fetchall()
-        paid = sum([x[0] for x in paid_rows])
-        due = total - paid
-
-        if due > 0:
-            due_list.append([sid, name, mobile, total, paid, due])
-
     conn.close()
-    return render_template("bulk_whatsapp.html", due_list=due_list)
+
+    return render_template("bulk_whatsapp.html", students=students)
 
 @app.route("/upload_homework", methods=["GET", "POST"])
 def upload_homework():
@@ -498,67 +493,64 @@ def global_search():
 
 from flask import session
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    error = None
-    if request.method == "POST":
-        user = request.form["username"]
-        pwd = request.form["password"]
+from flask import Flask, render_template, request, redirect, session, send_file
+import sqlite3, os
 
-        conn = sqlite3.connect("db.sqlite3")
-        cur = conn.cursor()
-        cur.execute("SELECT role FROM users WHERE username=? AND password=?", (user, pwd))
-        row = cur.fetchone()
-        conn.close()
+app = Flask(__name__)
+app.secret_key = "RAJ_SECRET_KEY_123"
 
-        if row:
-            session["username"] = user
-            session["role"] = row[0]
+{% extends "base.html" %}
+{% block content %}
+<h2>📚 Your Notes</h2>
 
-            if row[0] == "admin":
-                return redirect("/admin_dashboard")
-            else:
-                return redirect("/teacher_dashboard")
-        else:
-            error = "❌ Invalid username or password"
+{% if notes %}
+  <table border="1" cellpadding="6">
+    <tr><th>Subject</th><th>Title</th><th>Download</th></tr>
+    {% for note in notes %}
+      <tr>
+        <td>{{ note[0] }}</td>
+        <td>{{ note[1] }}</td>
+        <td><a href="/static/notes/{{ note[2] }}" download>📥 Download</a></td>
+      </tr>
+    {% endfor %}
+  </table>
+{% else %}
+  <p>No notes available for your assigned subjects.</p>
+{% endif %}
 
-    return render_template("login.html", error=error)
+<a href="/student_dashboard/{{ student_id }}">⬅️ Back</a>
+{% endblock %}
 
-from flask import send_file
-import os
+
 
 @app.route("/backup")
 def backup():
     if "role" not in session or session["role"] != "admin":
         return "⛔ Access Denied"
 
-    db_path = "db.sqlite3"  # DB का नाम
-
+    db_path = "db.sqlite3"
     if os.path.exists(db_path):
         return send_file(db_path, as_attachment=True)
     else:
         return "❌ Database file not found!"
+
 
 @app.route("/progress_report/<int:student_id>")
 def progress_report(student_id):
     conn = sqlite3.connect("db.sqlite3")
     cur = conn.cursor()
 
-    # 1. Student Info
     cur.execute("SELECT name, class, mobile FROM students WHERE id=?", (student_id,))
     stu = cur.fetchone()
 
-    # 2. Test Marks
     cur.execute("SELECT subject, marks, date FROM test_marks WHERE student_id=?", (student_id,))
     test_data = cur.fetchall()
 
-    # 3. Attendance
     cur.execute("SELECT COUNT(*) FROM attendance WHERE student_id=?", (student_id,))
     total_days = cur.fetchone()[0]
     cur.execute("SELECT COUNT(*) FROM attendance WHERE student_id=? AND status='present'", (student_id,))
     present_days = cur.fetchone()[0]
 
-    # 4. Fees
     cur.execute("SELECT total_fee FROM fees WHERE student_id=?", (student_id,))
     fee_row = cur.fetchone()
     total_fee = fee_row[0] if fee_row else 0
@@ -577,7 +569,46 @@ def progress_report(student_id):
                            paid=paid,
                            student_id=student_id)
 
+@app.route("/block_panel")
+def block_panel():
+    if "role" not in session or session["role"] != "admin":
+        return "⛔ Access Denied"
 
+    conn = sqlite3.connect("db.sqlite3")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE status IN ('active', 'blocked')")
+    users = cur.fetchall()
+    conn.close()
+
+    return render_template("block_users.html", users=users)
+
+
+@app.route("/block_user/<int:user_id>")
+def block_user(user_id):
+    if "role" not in session or session["role"] != "admin":
+        return "⛔ Access Denied"
+
+    conn = sqlite3.connect("db.sqlite3")
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET status='blocked' WHERE id=?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect("/block_panel")
+
+
+@app.route("/unblock_user/<int:user_id>")
+def unblock_user(user_id):
+    if "role" not in session or session["role"] != "admin":
+        return "⛔ Access Denied"
+
+    conn = sqlite3.connect("db.sqlite3")
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET status='active' WHERE id=?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect("/block_panel")
 
 
 @app.route("/update_status", methods=["POST"])
@@ -601,12 +632,12 @@ def update_status():
 def teacher_login():
     error = None
     if request.method == "POST":
-        mobile = request.form["mobile"]
+        teacher_id = request.form["teacher_id"]
         password = request.form["password"]
 
         conn = sqlite3.connect("db.sqlite3")
         cur = conn.cursor()
-        cur.execute("SELECT id, password, status FROM teachers WHERE mobile=? AND password=?", (mobile, password))
+        cur.execute("SELECT id, password, status FROM teachers WHERE id=? AND password=?", (teacher_id, password))
         teacher = cur.fetchone()
         conn.close()
 
@@ -618,11 +649,28 @@ def teacher_login():
             else:
                 session["teacher_id"] = teacher[0]
                 session["role"] = "teacher"
-                return redirect("/teacher_dashboard")
+                return redirect(f"/teacher_dashboard/{teacher[0]}")
         else:
-            error = "❌ Invalid Login Details"
+            error = "❌ Invalid ID or Password"
 
     return render_template("teacher_login.html", error=error)
+
+@app.route("/teacher_dashboard/<int:teacher_id>")
+def teacher_dashboard(teacher_id):
+    if "role" not in session or session["role"] != "teacher":
+        return "⛔ Access Denied"
+
+    conn = sqlite3.connect("db.sqlite3")
+    cur = conn.cursor()
+    cur.execute("SELECT name FROM teachers WHERE id=?", (teacher_id,))
+    teacher = cur.fetchone()
+    conn.close()
+
+    if not teacher:
+        return "❌ Teacher not found"
+
+    return render_template("teacher_dashboard.html", teacher_name=teacher[0], teacher_id=teacher_id)
+
 
 @app.route("/teacher_dashboard")
 def teacher_dashboard():
@@ -809,6 +857,171 @@ def mark_left():
 
     return render_template("mark_left.html", message=message)
 
+
+@app.route("/create_account", methods=["GET", "POST"])
+def create_account():
+    if request.method == "POST":
+        name = request.form["name"]
+        username = request.form["username"]
+        password = request.form["password"]
+        role = request.form["role"]
+
+        conn = sqlite3.connect("db.sqlite3")
+        cur = conn.cursor()
+        cur.execute("INSERT INTO users (name, username, password, role, status) VALUES (?, ?, ?, ?, 'pending')", 
+                    (name, username, password, role))
+        conn.commit()
+        conn.close()
+
+        return "✅ Account request submitted. Wait for Admin approval."
+    
+    return render_template("create_account.html")
+
+@app.route("/pending_users")
+def pending_users():
+    if "role" not in session or session["role"] != "admin":
+        return "⛔ Access Denied"
+
+    conn = sqlite3.connect("db.sqlite3")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE status='pending'")
+    users = cur.fetchall()
+    conn.close()
+
+    return render_template("pending_accounts.html", users=users)
+
+@app.route("/approve_user/<int:user_id>")
+def approve_user(user_id):
+    if "role" not in session or session["role"] != "admin":
+        return "⛔ Access Denied"
+    
+    conn = sqlite3.connect("db.sqlite3")
+    cur = conn.cursor()
+    cur.execute("UPDATE users SET status='approved' WHERE id=?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect("/pending_users")
+
+@app.route("/reject_user/<int:user_id>")
+def reject_user(user_id):
+    if "role" not in session or session["role"] != "admin":
+        return "⛔ Access Denied"
+
+    conn = sqlite3.connect("db.sqlite3")
+    cur = conn.cursor()
+    cur.execute("DELETE FROM users WHERE id=?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect("/pending_users")
+
+@app.route("/add_fees", methods=["GET", "POST"])
+def add_fees():
+    if "role" not in session or session["role"] != "admin":
+        return "⛔ Access Denied"
+
+    message = ""
+    if request.method == "POST":
+        student_id = request.form["student_id"]
+        amount_paid = float(request.form["amount_paid"])
+        date = request.form["date"]
+        note = request.form["note"]
+
+        conn = sqlite3.connect("db.sqlite3")
+        cur = conn.cursor()
+
+        # Insert into fees_history
+        cur.execute("INSERT INTO fees_history (student_id, amount_paid, date, note) VALUES (?, ?, ?, ?)",
+                    (student_id, amount_paid, date, note))
+
+        conn.commit()
+        conn.close()
+
+        message = f"✅ ₹{amount_paid} fees recorded for student {student_id}"
+
+    return render_template("add_fees.html", message=message)
+
+@app.route("/manage_users")
+def manage_users():
+    if "role" not in session or session["role"] != "admin":
+        return "⛔ Access Denied"
+
+    conn = sqlite3.connect("db.sqlite3")
+    cur = conn.cursor()
+    cur.execute("SELECT id, username, role, status FROM users")
+    users = cur.fetchall()
+    conn.close()
+
+    return render_template("manage_users.html", users=users)
+
+@app.route("/toggle_user_status/<int:user_id>")
+def toggle_user_status(user_id):
+    if "role" not in session or session["role"] != "admin":
+        return "⛔ Access Denied"
+
+    conn = sqlite3.connect("db.sqlite3")
+    cur = conn.cursor()
+    cur.execute("SELECT status FROM users WHERE id=?", (user_id,))
+    status = cur.fetchone()[0]
+    new_status = "blocked" if status == "active" else "active"
+    cur.execute("UPDATE users SET status=? WHERE id=?", (new_status, user_id))
+    conn.commit()
+    conn.close()
+
+    return redirect("/manage_users")
+
+
+@app.route("/assign_subjects", methods=["GET", "POST"])
+def assign_subjects():
+    if "role" not in session or session["role"] != "admin":
+        return "⛔ Access Denied"
+
+    conn = sqlite3.connect("db.sqlite3")
+    cur = conn.cursor()
+
+    if request.method == "POST":
+        student_id = request.form["student_id"]
+        selected_subjects = request.form.getlist("subjects")  # multiple subjects
+        cur.execute("DELETE FROM subject_mapping WHERE student_id=?", (student_id,))
+        for subject in selected_subjects:
+            cur.execute("INSERT INTO subject_mapping (student_id, subject) VALUES (?, ?)", (student_id, subject))
+        conn.commit()
+
+    cur.execute("SELECT id, name FROM students WHERE status='active'")
+    students = cur.fetchall()
+
+    cur.execute("SELECT DISTINCT subject FROM test_marks")
+    subjects = [row[0] for row in cur.fetchall()]
+
+    conn.close()
+    return render_template("assign_subjects.html", students=students, subjects=subjects)
+
+@app.route("/reset_password", methods=["GET", "POST"])
+def reset_password():
+    if "username" not in session:
+        return redirect("/login")
+
+    message = ""
+    if request.method == "POST":
+        current_pwd = request.form["current_password"]
+        new_pwd = request.form["new_password"]
+
+        conn = sqlite3.connect("db.sqlite3")
+        cur = conn.cursor()
+        cur.execute("SELECT password FROM users WHERE username=?", (session["username"],))
+        real_pwd = cur.fetchone()[0]
+
+        if current_pwd != real_pwd:
+            message = "❌ Incorrect current password"
+        else:
+            cur.execute("UPDATE users SET password=? WHERE username=?", (new_pwd, session["username"]))
+            conn.commit()
+            message = "✅ Password updated successfully"
+
+        conn.close()
+
+    return render_template("reset_password.html", message=message)
 
 
 

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>🛡️ Manage Users</h2>
+
+<table border="1" cellpadding="6">
+  <tr><th>Username</th><th>Role</th><th>Status</th><th>Action</th></tr>
+  {% for u in users %}
+    <tr>
+      <td>{{ u[1] }}</td>
+      <td>{{ u[2] }}</td>
+      <td>{{ u[3] }}</td>
+      <td>
+        <a href="/toggle_user_status/{{ u[0] }}">
+          {% if u[3] == 'active' %} 🔒 Block {% else %} 🔓 Unblock {% endif %}
+        </a>
+      </td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

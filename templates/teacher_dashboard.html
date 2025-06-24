@@ -1,10 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>👨‍🏫 Teacher Dashboard</h2>
+<h2>🧑‍🏫 Welcome, {{ teacher_name }} (ID: {{ teacher_id }})</h2>
+
+<p>This is your dashboard. You can:</p>
 
 <ul>
-  <li><a href="/mark_attendance">📝 Mark Attendance</a></li>
-  <li><a href="/upload_homework">📚 Upload Homework</a></li>
-  <li><a href="/upload_notes">📤 Upload Notes</a></li>
+  <li><a href="/mark_attendance">📅 Mark Attendance</a></li>
+  <li><a href="/upload_notes">📚 Upload Notes</a></li>
+  <li><a href="/upload_homework">📝 Upload Homework</a></li>
+  <li><a href="/view_doubts">❓ View & Reply to Doubts</a></li>
 </ul>
+
+<a href="/logout">🚪 Logout</a>
 {% endblock %}

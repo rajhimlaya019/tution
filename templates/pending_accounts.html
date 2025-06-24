@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>👤 Pending User Approvals</h2>
+
+{% if users %}
+<table border="1" cellpadding="8" cellspacing="0">
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Username</th>
+    <th>Role</th>
+    <th>Actions</th>
+  </tr>
+  {% for user in users %}
+  <tr>
+    <td>{{ user[0] }}</td>
+    <td>{{ user[1] }}</td>
+    <td>{{ user[2] }}</td>
+    <td>{{ user[4] }}</td>
+    <td>
+      <a href="/approve_user/{{ user[0] }}">✅ Approve</a> |
+      <a href="/reject_user/{{ user[0] }}">❌ Reject</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>No pending users.</p>
+{% endif %}
+{% endblock %}

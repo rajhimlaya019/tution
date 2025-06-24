@@ -1,21 +1,34 @@
-<!-- templates/login.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login Page</title>
-</head>
-<body>
-    <h1>🔐 Login Page</h1>
-    <form method="POST">
-        <label>Username:</label>
-        <input type="text" name="username" required><br><br>
-        <label>Password:</label>
-        <input type="password" name="password" required><br><br>
-        <button type="submit">Login</button>
-    </form>
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width:400px; margin:auto; background:#f8f8f8; padding:20px; border-radius:10px;">
+  <h2 style="text-align:center;">🔐 Login</h2>
 
-    {% if error %}
-        <p style="color:red;">{{ error }}</p>
-    {% endif %}
-</body>
-</html>
+  <form method="POST" action="/login">
+    <label>Username:</label>
+    <input type="text" name="username" required class="form-control"><br>
+
+    <label>Password:</label>
+    <input type="password" name="password" required class="form-control"><br>
+
+    <label>Login Type:</label>
+    <select name="role" required class="form-control">
+      <option value="student">Student</option>
+      <option value="teacher">Teacher</option>
+      <option value="admin">Admin</option>
+    </select><br>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+  </form>
+
+  <hr>
+
+  <p style="text-align:center;">
+    👤 New Student or Teacher?<br>
+    <a href="/create_account">Create Account</a>
+  </p>
+
+  {% if error %}
+    <p style="color:red;">{{ error }}</p>
+  {% endif %}
+</div>
+{% endblock %}

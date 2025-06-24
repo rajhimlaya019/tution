@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>🚫 Block / Unblock Users</h2>
+
+<table border="1" cellpadding="8" cellspacing="0">
+  <tr>
+    <th>Username</th>
+    <th>Role</th>
+    <th>Status</th>
+    <th>Action</th>
+  </tr>
+  {% for user in users %}
+  <tr>
+    <td>{{ user[1] }}</td>
+    <td>{{ user[3] }}</td>
+    <td>{{ user[4] }}</td>
+    <td>
+      {% if user[4] == 'active' %}
+        <a href="/block_user/{{ user[0] }}">❌ Block</a>
+      {% elif user[4] == 'blocked' %}
+        <a href="/unblock_user/{{ user[0] }}">✅ Unblock</a>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<a href="/admin_dashboard">🔙 Back to Dashboard</a>
+{% endblock %}

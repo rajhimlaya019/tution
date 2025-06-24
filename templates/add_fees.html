@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>💰 Add Fees for Student</h2>
+
+<form method="POST" action="/add_fees" style="max-width:500px; background:#fff; padding:20px; border:1px solid #ccc;">
+  
+  <label>Student ID:</label>
+  <input type="number" name="student_id" required class="form-control"><br>
+
+  <label>Amount Paid (₹):</label>
+  <input type="number" name="amount_paid" required step="0.01" class="form-control"><br>
+
+  <label>Date:</label>
+  <input type="date" name="date" required class="form-control"><br>
+
+  <label>Note (Optional):</label>
+  <input type="text" name="note" class="form-control"><br>
+
+  <button type="submit" class="btn btn-success">💾 Save</button>
+</form>
+
+{% if message %}
+  <p style="color:green;">{{ message }}</p>
+{% endif %}
+
+<a href="/admin_dashboard">🔙 Back to Dashboard</a>
+{% endblock %}

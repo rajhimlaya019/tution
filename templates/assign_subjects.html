@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📘 Assign Subjects to Students</h2>
+
+<form method="POST">
+  <label>👤 Select Student:</label>
+  <select name="student_id" required>
+    {% for stu in students %}
+      <option value="{{ stu[0] }}">{{ stu[1] }} (ID: {{ stu[0] }})</option>
+    {% endfor %}
+  </select><br><br>
+
+  <label>📚 Select Subjects:</label><br>
+  {% for sub in subjects %}
+    <input type="checkbox" name="subjects" value="{{ sub }}"> {{ sub }}<br>
+  {% endfor %}
+
+  <br>
+  <button type="submit">✅ Assign</button>
+</form>
+{% endblock %}

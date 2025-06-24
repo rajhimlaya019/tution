@@ -22,6 +22,8 @@
     <h3>💸 Fees</h3>
     <ul>
       <li><a href="/ledger">🔎 Search Ledger</a></li>
+      <li><a href="/add_fees">➕ Add Fees</a></li>
+      <li><a href="/fees_history">📜 Fee History</a></li>
       <li><a href="/bulk_whatsapp">📲 WhatsApp Reminders</a></li>
     </ul>
   </div>
@@ -36,12 +38,15 @@
   <div>
     <h3>📨 Doubts</h3>
     <ul>
-      <li><a href="/view_doubts">
-        👁️ View & Reply
-        {% if session.get("doubt_count", 0) > 0 %}
-          <span style="color:red;">({{ session['doubt_count'] }})</span>
-        {% endif %}
-      </a></li>
+      <li><a href="/view_doubts">👁️ View & Reply</a></li>
+    </ul>
+  </div>
+
+  <div>
+    <h3>📊 Test Marks</h3>
+    <ul>
+      <li><a href="/add_marks">📝 Add Marks</a></li>
+      <li><a href="/marks_history">📚 Marks History</a></li>
     </ul>
   </div>
 
@@ -56,13 +61,6 @@
     <h3>💾 Backup</h3>
     <ul>
       <li><a href="/backup">📥 Download Database</a></li>
-    </ul>
-  </div>
-
-  <div>
-    <h3>🔐 Manage Access</h3>
-    <ul>
-      <li><a href="/update_status_form">🛠️ Block/Unblock Users</a></li>
     </ul>
   </div>
 
