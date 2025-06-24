@@ -649,11 +649,6 @@ def teacher_dashboard(teacher_id):
     return render_template("teacher_dashboard.html", teacher_name=teacher[0], teacher_id=teacher_id)
 
 
-@app.route("/teacher_dashboard")
-def teacher_dashboard():
-    if "role" not in session or session["role"] != "teacher":
-        return "⛔ Access Denied"
-    return render_template("teacher_dashboard.html")
 
 @app.route("/student_change_password", methods=["GET", "POST"])
 def student_change_password():
