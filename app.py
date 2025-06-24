@@ -16,7 +16,12 @@ app.secret_key = "RAJ_SECRET_KEY_123"
 
 @app.route("/")
 def home():
-    return render_template("home.html")
+    return """
+        <h1>🏫 Welcome to Tuition App</h1>
+        <p>This is working!</p>
+        <p><a href='/login'>🔐 Go to Login</a></p>
+    """
+
 
 from flask import request, redirect
 import sqlite3
