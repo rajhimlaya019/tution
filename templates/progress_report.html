@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📋 Progress Report – {{ stu[0] }}</h2>
+
+<p><strong>ID:</strong> {{ student_id }}</p>
+<p><strong>Class:</strong> {{ stu[1] }}</p>
+<p><strong>Mobile:</strong> {{ stu[2] }}</p>
+
+<hr>
+
+<h3>📊 Test Marks:</h3>
+<table border="1" cellpadding="6">
+  <tr><th>Subject</th><th>Marks</th><th>Date</th></tr>
+  {% for row in test_data %}
+  <tr><td>{{ row[0] }}</td><td>{{ row[1] }}</td><td>{{ row[2] }}</td></tr>
+  {% endfor %}
+</table>
+
+<hr>
+
+<h3>📅 Attendance:</h3>
+<p>Present: {{ present_days }} / {{ total_days }} days</p>
+<p>Percentage: {{ "%.1f"|format((present_days/total_days*100) if total_days>0 else 0) }}%</p>
+
+<hr>
+
+<h3>💸 Fees:</h3>
+<p>Total Fee: ₹{{ total_fee }}</p>
+<p>Paid: ₹{{ paid }}</p>
+<p><strong>Due: ₹{{ total_fee - paid }}</strong></p>
+
+<a href="/student_dashboard/{{ student_id }}">⬅️ Back to Dashboard</a>
+{% endblock %}

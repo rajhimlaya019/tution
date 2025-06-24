@@ -1,0 +1,15 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tuition App</title>
+</head>
+<body>
+  <h1>📚 Tuition Manager</h1>
+  <a href="/">Home</a> |
+  <a href="/add_student">Add Student</a> |
+  <a href="/students">View Students</a>
+  <hr>
+  {% block content %}{% endblock %}
+</body>
+</html>

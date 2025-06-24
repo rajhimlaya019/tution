@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📅 Attendance & Homework</h2>
+
+<p><b>Student ID:</b> {{ student_id }}</p>
+
+<table border="1" cellpadding="6">
+  <tr>
+    <th>Date</th>
+    <th>Status</th>
+    <th>Homework</th>
+  </tr>
+  {% for row in data %}
+  <tr>
+    <td>{{ row[0] }}</td>
+    <td>{{ row[1] }}</td>
+    <td>{{ row[2] }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<a href="/student_dashboard/{{ student_id }}">⬅️ Back to Dashboard</a>
+{% endblock %}

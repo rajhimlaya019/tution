@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📒 Student Fee Ledger</h2>
+
+<form method="GET" action="/ledger">
+  Enter Student ID: <input type="text" name="student_id" required>
+  <button type="submit">Search</button>
+</form>
+
+{% if student %}
+  <hr>
+  <h3>👤 {{ student[1] }} (ID: {{ student[0] }})</h3>
+  <p>Total Fee: ₹{{ total_fee }}</p>
+  <p>Total Paid: ₹{{ total_paid }}</p>
+  <p><strong>Due: ₹{{ total_fee - total_paid }}</strong></p>
+
+  <!-- ✅ WhatsApp Reminder Button -->
+  <p>
+    <a href="/send_whatsapp/{{ student[0] }}" target="_blank" style="color: green; font-weight: bold;">
+      📲 Send WhatsApp Reminder
+    </a>
+  </p>
+
+  <h4>💸 Payment History:</h4>
+  <table border="1" cellpadding="6">
+    <tr><th>Date</th><th>Amount</th><th>Note</th></tr>
+    {% for row in history %}
+    <tr>
+      <td>{{ row[2] }}</td>
+      <td>₹{{ row[1] }}</td>
+      <td>{{ row[3] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endif %}
+{% endblock %}

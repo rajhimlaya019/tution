@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>💸 Add Fee Payment</h2>
+
+<form method="POST" action="/fees_entry">
+  Student ID: <input type="text" name="student_id" required><br><br>
+  Amount Paid: <input type="number" name="amount_paid" required><br><br>
+  Date: <input type="date" name="date" required><br><br>
+  Note (reason): <input type="text" name="note" placeholder="pen, book, party..."><br><br>
+
+  <button type="submit">Save Payment</button>
+</form>
+{% endblock %}

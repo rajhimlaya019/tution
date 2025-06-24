@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>🧑‍🏫 Admin Dashboard</h2>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+
+  <div>
+    <h3>📚 Homework</h3>
+    <ul>
+      <li><a href="/upload_homework">✍️ Upload Homework</a></li>
+    </ul>
+  </div>
+
+  <div>
+    <h3>📅 Attendance</h3>
+    <ul>
+      <li><a href="/mark_attendance">📝 Mark Attendance</a></li>
+    </ul>
+  </div>
+
+  <div>
+    <h3>💸 Fees</h3>
+    <ul>
+      <li><a href="/ledger">🔎 Search Ledger</a></li>
+      <li><a href="/bulk_whatsapp">📲 WhatsApp Reminders</a></li>
+    </ul>
+  </div>
+
+  <div>
+    <h3>🧾 Notes</h3>
+    <ul>
+      <li><a href="/upload_notes">📤 Upload Notes</a></li>
+    </ul>
+  </div>
+
+  <div>
+    <h3>📨 Doubts</h3>
+    <ul>
+      <li><a href="/view_doubts">
+        👁️ View & Reply
+        {% if session.get("doubt_count", 0) > 0 %}
+          <span style="color:red;">({{ session['doubt_count'] }})</span>
+        {% endif %}
+      </a></li>
+    </ul>
+  </div>
+
+  <div>
+    <h3>🔍 Search</h3>
+    <ul>
+      <li><a href="/global_search">🔍 Global Student Search</a></li>
+    </ul>
+  </div>
+
+  <div>
+    <h3>💾 Backup</h3>
+    <ul>
+      <li><a href="/backup">📥 Download Database</a></li>
+    </ul>
+  </div>
+
+  <div>
+    <h3>🔐 Manage Access</h3>
+    <ul>
+      <li><a href="/update_status_form">🛠️ Block/Unblock Users</a></li>
+    </ul>
+  </div>
+
+</div>
+{% endblock %}

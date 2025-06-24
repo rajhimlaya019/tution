@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>💰 Update Fees</h2>
+
+  <form method="POST" action="/add_fee">
+    Student ID: <input type="text" name="student_id" required><br><br>
+    Total Fee: <input type="number" name="total_fee"><br><br>
+    Paid Fee: <input type="number" name="paid_fee"><br><br>
+    Last Paid Date: <input type="date" name="last_paid"><br><br>
+    <button type="submit">Save Fees</button>
+  </form>
+{% endblock %}

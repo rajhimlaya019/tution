@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📨 Ask a Doubt</h2>
+
+<form method="POST">
+  <label>Your Doubt:</label><br>
+  <textarea name="message" rows="4" cols="60" required></textarea><br><br>
+  <button type="submit">Send</button>
+</form>
+
+<hr>
+<h3>📜 Your Previous Doubts:</h3>
+<ul>
+  {% for row in doubts %}
+    <li><b>{{ row[2] }}</b> - <i>{{ row[3] }}</i></li>
+  {% endfor %}
+</ul>
+
+<a href="/student_dashboard/{{ student_id }}">⬅️ Back to Dashboard</a>
+{% endblock %}

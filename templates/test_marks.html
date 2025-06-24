@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📊 Test Marks for Student ID: {{ student_id }}</h2>
+
+<table border="1" cellpadding="6">
+  <tr>
+    <th>Date</th>
+    <th>Subject</th>
+    <th>Total</th>
+    <th>Obtained</th>
+  </tr>
+  {% for row in marks %}
+  <tr>
+    <td>{{ row[2] }}</td>
+    <td>{{ row[1] }}</td>
+    <td>{{ row[3] }}</td>
+    <td>{{ row[4] }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<a href="/student_dashboard/{{ student_id }}">⬅️ Back to Dashboard</a>
+{% endblock %}

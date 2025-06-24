@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>📅 Mark Attendance</h2>
+
+  <form method="POST" action="/attendance">
+    Date: <input type="date" name="date" required>
+    Class: <input type="text" name="student_class" required>
+    <button type="submit">Load Students</button>
+  </form>
+
+  {% if students %}
+    <form method="POST" action="/save_attendance">
+      <input type="hidden" name="date" value="{{ date }}">
+      <input type="hidden" name="student_class" value="{{ student_class }}">
+
+      <h3>Students in {{ student_class }} on {{ date }}:</h3>
+      {% for s in students %}
+        <input type="checkbox" name="present_ids" value="{{ s[0] }}" checked>
+        {{ s[1] }} ({{ s[2] }})<br>
+      {% endfor %}
+      <br>
+      <button type="submit">Save Attendance</button>
+    </form>
+  {% endif %}
+{% endblock %}

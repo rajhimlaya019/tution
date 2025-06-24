@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>💳 Fees List</h2>
+  <table border="1" cellpadding="6">
+    <tr><th>ID</th><th>Name</th><th>Total</th><th>Paid</th><th>Due</th><th>Last Paid</th><th>WhatsApp</th></tr>
+    {% for f in fees %}
+    <tr>
+      <td>{{ f[0] }}</td>
+      <td>{{ f[1] }}</td>
+      <td>₹{{ f[2] }}</td>
+      <td>₹{{ f[3] }}</td>
+      <td>₹{{ f[2] - f[3] }}</td>
+      <td>{{ f[4] }}</td>
+      <td>
+        <a href="https://wa.me/91{{ f[5] }}?text={{ msg(f[1], f[2]-f[3]) }}" target="_blank">Send</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

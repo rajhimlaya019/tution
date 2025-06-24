@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📚 Notes for Class {{ student_class }}</h2>
+
+<table border="1" cellpadding="6">
+  <tr>
+    <th>Subject</th>
+    <th>Topic</th>
+    <th>Download</th>
+  </tr>
+  {% for row in notes %}
+  <tr>
+    <td>{{ row[0] }}</td>
+    <td>{{ row[1] }}</td>
+    <td><a href="/{{ row[2] }}" download>📥 Download</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

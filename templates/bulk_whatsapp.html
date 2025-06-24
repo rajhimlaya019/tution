@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📲 WhatsApp Reminder – Due Fee Students</h2>
+
+<table border="1" cellpadding="6">
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Mobile</th>
+    <th>Total</th>
+    <th>Paid</th>
+    <th>Due</th>
+    <th>Send</th>
+  </tr>
+  {% for s in due_list %}
+  <tr>
+    <td>{{ s[0] }}</td>
+    <td>{{ s[1] }}</td>
+    <td>{{ s[2] }}</td>
+    <td>₹{{ s[3] }}</td>
+    <td>₹{{ s[4] }}</td>
+    <td><strong>₹{{ s[5] }}</strong></td>
+    <td>
+      <a href="https://wa.me/{{ s[2] }}?text=नमस्ते {{ s[1] }}, आपकी फीस ₹{{ s[5] }} बाकी है | कृपया जल्द भुगतान करें | - RAJ Tuition"
+         target="_blank" style="color:green; font-weight:bold;">Send</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

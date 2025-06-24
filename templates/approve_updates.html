@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>🛠️ Approve Student Info Updates</h2>
+
+{% if requests %}
+<table border="1" cellpadding="6">
+  <tr><th>ID</th><th>Student ID</th><th>Field</th><th>Old</th><th>New</th><th>Action</th></tr>
+  {% for r in requests %}
+  <tr>
+    <td>{{ r[0] }}</td>
+    <td>{{ r[1] }}</td>
+    <td>{{ r[2] }}</td>
+    <td>{{ r[3] }}</td>
+    <td>{{ r[4] }}</td>
+    <td>
+      <form method="POST" style="display:inline;">
+        <input type="hidden" name="request_id" value="{{ r[0] }}">
+        <button type="submit" name="action" value="approve">✅ Approve</button>
+        <button type="submit" name="action" value="reject">❌ Reject</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>No pending requests</p>
+{% endif %}
+{% endblock %}

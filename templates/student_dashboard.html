@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📋 Welcome Student ID: {{ student_id }}</h2>
+<p>This is your dashboard. You can:</p>
+
+<ul>
+  <li><a href="/student_attendance/{{ student_id }}">📅 View Attendance + Homework</a></li>
+  <li><a href="/ledger/{{ student_id }}">💸 Check Fee Details</a></li>
+  <li><a href="/notes/{{ student_id }}">📚 Download Notes</a></li>
+  <li><a href="/test_marks/{{ student_id }}">📊 See Test Marks</a></li>
+  <li><a href="/ask_doubt/{{ student_id }}">📨 Ask Doubts</a></li>
+  <li><a href="/progress_report/{{ student_id }}">📈 View Progress Report</a></li>
+</ul>
+
+<a href="/logout">🚪 Logout</a>
+{% endblock %}

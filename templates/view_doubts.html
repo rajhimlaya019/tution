@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📨 Student Doubts Panel (Admin View)</h2>
+
+<table border="1" cellpadding="6">
+  <tr>
+    <th>Student ID</th>
+    <th>Doubt</th>
+    <th>Date</th>
+    <th>Reply</th>
+    <th>Action</th>
+  </tr>
+  {% for row in doubts %}
+  <tr>
+    <td>{{ row[1] }}</td>
+    <td>{{ row[2] }}</td>
+    <td>{{ row[3] }}</td>
+    <td>{{ row[4] or '—' }}</td>
+    <td>
+      {% if not row[4] %}
+        <form method="POST" action="/reply_doubt/{{ row[0] }}">
+          <input type="text" name="reply" required>
+          <button type="submit">Reply</button>
+        </form>
+      {% else %}
+        ✅ Replied
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

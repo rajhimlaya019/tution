@@ -1,0 +1,12 @@
+<!-- templates/add_student.html -->
+{% extends "base.html" %}
+{% block content %}
+  <h2>➕ Add Student</h2>
+  <form method="POST" action="/add_student">
+    Name: <input type="text" name="name" required><br><br>
+    Phone: <input type="text" name="phone" required><br><br>
+    Class: <input type="text" name="student_class"><br><br>
+    Address: <input type="text" name="address"><br><br>
+    <button type="submit">Save Student</button>
+  </form>
+{% endblock %}

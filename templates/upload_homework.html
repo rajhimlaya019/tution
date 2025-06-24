@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>✍️ Upload Homework</h2>
+
+<form method="POST">
+  <label>Class:</label>
+  <input type="text" name="class" required><br><br>
+
+  <label>Subject:</label>
+  <input type="text" name="subject" required><br><br>
+
+  <label>Date:</label>
+  <input type="date" name="date" required><br><br>
+
+  <label>Homework Content:</label><br>
+  <textarea name="content" rows="6" cols="60" required></textarea><br><br>
+
+  <button type="submit">📤 Upload</button>
+</form>
+{% endblock %}
