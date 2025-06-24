@@ -648,6 +648,13 @@ def teacher_dashboard(teacher_id):
 
     return render_template("teacher_dashboard.html", teacher_name=teacher[0], teacher_id=teacher_id)
 
+@app.route("/admin_dashboard")
+def admin_dashboard():
+    return render_template("admin_dashboard.html")
+
+@app.route("/teacher_dashboard")
+def teacher_dashboard():
+    return render_template("teacher_dashboard.html")
 
 
 @app.route("/student_change_password", methods=["GET", "POST"])
